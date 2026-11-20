@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1427">
+  <meta name="description" content="Sistem carian maklumat murid SK Sungai Tiram. PWA dengan reka bentuk Midnight Navy dan Metallic Gold.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png">
+  <title>SK Sungai Tiram | Sistem Carian Murid</title>
+  <style>
+    *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#081021;color:#f4f7ff;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}body{overflow:hidden}
+    #app{width:100%;height:100%;height:100dvh;border:none;display:block;background:#081021;position:relative;z-index:2}
+    #splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:3;background:radial-gradient(ellipse 600px 400px at 50% 25%,#1e2c47,#09111f 70%);transition:opacity .45s ease,visibility .45s ease;padding:25px;text-align:center}
+    #splash.done{opacity:0;visibility:hidden;pointer-events:none}.logo{height:82px;width:82px;background:linear-gradient(145deg,#fff0bd,#bb843a,#f6da91);display:grid;place-items:center;border-radius:25px;color:#1a2639;font-size:26px;font-weight:900;letter-spacing:-1px;box-shadow:0 0 50px #daa95d35}
+    h1{font-size:25px;letter-spacing:-.8px;margin:23px 0 5px}p{color:#9eb0c9;font-size:13px;max-width:450px;line-height:1.7}.track{height:3px;width:160px;background:#ffffff22;overflow:hidden;border-radius:3px;margin-top:22px}.bar{height:100%;width:45%;background:#e2b963;animation:load 1.4s infinite ease-in-out;border-radius:3px}@keyframes load{0%{transform:translateX(-150%)}100%{transform:translateX(370%)}}
+    .open{display:inline-block;border:1px solid #dcb46966;border-radius:12px;padding:12px 15px;text-decoration:none;color:#f0ce8c;font-weight:750;font-size:12px;margin-top:23px;background:#e3b6610c}.open:hover{background:#e3b66124}.direct-fallback{position:fixed;z-index:4;bottom:12px;right:12px;color:#ffe3ac;background:#0d1a30e8;border:1px solid #dcb46955;border-radius:10px;padding:8px 10px;font-size:11px;font-weight:750;text-decoration:none;box-shadow:0 5px 22px #0003;opacity:.85}.direct-fallback:hover{opacity:1;background:#253451}
+    #offline{position:fixed;z-index:5;inset:0;display:none;align-items:center;justify-content:center;padding:30px;text-align:center;background:#0a1428}#offline.show{display:flex}#offline .box{max-width:470px}#offline h2{font-size:22px;margin:14px 0}#offline button{color:#172034;background:linear-gradient(110deg,#fce9bc,#d7a85c);border:0;border-radius:11px;padding:12px 17px;font-weight:800;margin-top:15px;cursor:pointer}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  </style>
+</head>
+<body>
+  <!-- URL Apps Script yang telah diberikan. Jangan letak kata laluan di fail GitHub. -->
+  <iframe
+    id="app"
+    title="Sistem Carian Maklumat Murid SK Sungai Tiram"
+    src="https://script.google.com/macros/s/AKfycby5UJhujNUfQylBXo-slnRuMGB-J24uSIqNQ2CmSHBjD_B7FYx1LTKdhsdqSZSqpxiv/exec"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allow="clipboard-write"
+  ></iframe>
+  <a class="direct-fallback" href="https://script.google.com/macros/s/AKfycby5UJhujNUfQylBXo-slnRuMGB-J24uSIqNQ2CmSHBjD_B7FYx1LTKdhsdqSZSqpxiv/exec" target="_blank" rel="noopener noreferrer" aria-label="Buka Apps Script secara langsung">Buka terus ↗</a>
+  <div id="splash" aria-live="polite"><div class="logo">SKST</div><h1>Sistem Carian Murid</h1><p>SK Sungai Tiram · Menyambungkan portal ke Google Sheet melalui Apps Script.</p><div class="track"><div class="bar"></div></div><a class="open" href="https://script.google.com/macros/s/AKfycby5UJhujNUfQylBXo-slnRuMGB-J24uSIqNQ2CmSHBjD_B7FYx1LTKdhsdqSZSqpxiv/exec" target="_blank" rel="noopener noreferrer">Buka sistem secara langsung</a></div>
+  <div id="offline"><div class="box"><div class="logo" style="margin:auto">SKST</div><h2>Sambungan internet diperlukan</h2><p>PWA boleh dipasang, tetapi carian murid mesti menggunakan internet untuk mendapatkan data terkini. Tiada data perubatan atau kad pengenalan disimpan secara luar talian.</p><button type="button" onclick="location.reload()">Cuba Lagi</button></div></div>
+  <script>
+    'use strict';
+    const frame=document.getElementById('app');
+    const splash=document.getElementById('splash');
+    const offline=document.getElementById('offline');
+    frame.addEventListener('load',()=>splash.classList.add('done'));
+    const checkOnline=()=>{offline.classList.toggle('show',!navigator.onLine);if(navigator.onLine)frame.src=frame.getAttribute('src');};
+    window.addEventListener('offline',()=>offline.classList.add('show'));
+    window.addEventListener('online',checkOnline);
+    if(!navigator.onLine)offline.classList.add('show');
+    if('serviceWorker' in navigator && location.protocol==='https:'){
+      window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{}));
+    }
+  </script>
+</body>
+</html>
