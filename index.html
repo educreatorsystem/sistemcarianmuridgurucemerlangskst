@@ -14,13 +14,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
   <title>Carian Murid • SK Sungai Tiram</title>
 </head>
 <body>
   <div class="page-orb orb-one" aria-hidden="true"></div>
   <div class="page-orb orb-two" aria-hidden="true"></div>
   <div class="page-orb orb-three" aria-hidden="true"></div>
+  <div class="background-sparkles" aria-hidden="true"><span>✦</span><span>＋</span><span>✧</span><span>✦</span><span>◦</span></div>
   <header class="site-header">
     <div class="header-decoration" aria-hidden="true">✦</div>
     <div class="brand-wrap">
@@ -48,16 +49,20 @@
       <div class="filter-bottom"><span class="filter-tip">Gabungkan tapisan untuk mendapatkan senarai yang diperlukan.</span><button id="generate" class="btn-warm">📋 Jana senarai</button></div>
     </section>
     <section class="list-panel" id="listPanel" aria-labelledby="listTitle">
-      <div class="list-heading"><div><span class="section-label">DIREKTORI SEKOLAH</span><h2 id="listTitle">Senarai murid</h2><p id="count" aria-live="polite">Menghubungkan data…</p></div><div class="list-actions"><button id="refresh" class="btn-secondary">↻ Muat semula</button><button id="print" class="btn-primary">🖨️ Cetak / PDF</button></div></div>
+      <div class="list-heading"><div><span class="section-label">DIREKTORI SEKOLAH</span><h2 id="listTitle">Senarai murid</h2><p id="count" aria-live="polite">Menghubungkan data…</p></div><div class="list-actions"><button id="refresh" class="btn-secondary">↻ Muat semula</button><button id="print" class="btn-primary" hidden>🖨️ Cetak / PDF</button></div></div>
+      <div class="view-toolbar"><span>Paparan senarai</span><div class="view-switch" role="group" aria-label="Pilih paparan"><button id="viewCards" aria-label="Paparan kad" aria-pressed="true">▦ <span>Kad</span></button><button id="viewTable" aria-label="Paparan jadual" aria-pressed="false">☰ <span>Jadual</span></button></div></div>
       <div class="list-meta"><div id="activeFilters" class="active-filters" aria-label="Tapisan aktif"><span>Semua murid</span></div><span class="medical-key"><i aria-hidden="true"></i> Ada sejarah perubatan</span></div>
       <p id="status" class="status-line" role="status">Memulakan sambungan sekolah…</p>
       <p id="printinfo"></p>
-      <div class="table-scroll" id="results" tabindex="0" role="region" aria-label="Jadual senarai murid. Tatal mendatar untuk melihat semua kolum."><div class="empty">Memuatkan senarai murid…</div></div>
-      <div class="table-bottom"><span class="scroll-hint">↔ Tatal jadual untuk melihat semua kolum pada skrin kecil.</span><div class="pagination" id="pagination"><button id="prevPage" aria-label="Halaman sebelumnya" disabled>←</button><span id="pageInfo">—</span><button id="nextPage" aria-label="Halaman seterusnya" disabled>→</button></div></div>
+      <div class="table-scroll" id="results" tabindex="0" role="region" aria-label="Senarai murid"><div class="empty">Memuatkan senarai murid…</div></div>
+      <div class="table-bottom"><span class="scroll-hint">Kad disusun mengikut kelas dan nama murid.</span><div class="pagination" id="pagination"><button id="prevPage" aria-label="Halaman sebelumnya" disabled>←</button><span id="pageInfo">—</span><button id="nextPage" aria-label="Halaman seterusnya" disabled>→</button></div></div>
     </section>
     <footer><strong>SK SUNGAI TIRAM</strong> · ILMU PANDUAN HIDUP<br><span>Kegunaan guru · “Tiada sejarah direkodkan” merujuk rekod sumber, bukan pengesahan kesihatan.</span></footer>
   </main>
   <dialog id="login"><form id="loginform"><span class="icon-tile violet" aria-hidden="true">🔐</span><h2>Log masuk admin</h2><p>No. K/P hanya dipaparkan sepanjang sesi admin.</p><label>Nama pengguna<input name="username" autocomplete="username" required></label><label>Kata laluan<input name="password" type="password" autocomplete="current-password" required></label><p id="loginerror" role="alert"></p><div class="dialog-actions"><button type="button" id="cancel" class="btn-secondary">Batal</button><button class="btn-primary" id="submit">Log masuk</button></div></form></dialog>
-  <script src="config.js"></script><script src="app.js?v=2"></script>
+  <dialog id="exportDialog"><div class="export-heading"><span class="icon-tile violet" aria-hidden="true">🖨️</span><h2>Cetak &amp; PDF</h2><p id="exportCount"></p></div><p class="export-help">Untuk telefon, muat turun PDF untuk disimpan atau dicetak melalui pembaca PDF.</p><div class="export-actions"><button id="openPrint" class="btn-secondary">🖨️ Buka paparan cetak</button><button id="savePdf" class="btn-primary">↓ Muat turun PDF</button><button id="sharePdf" class="btn-secondary" hidden>↗ Kongsi / cetak PDF</button></div><p id="exportStatus" role="status" aria-live="polite"></p><a id="pdfLink" class="pdf-ready" hidden target="_blank" rel="noopener">Buka PDF yang dijana</a><div class="dialog-actions"><button id="closeExport" class="btn-secondary">Tutup</button></div></dialog>
+  <p id="printBlocked">Cetakan tersedia dalam mod admin sahaja.</p>
+  <script src="vendor/jspdf.umd.min.js"></script><script src="vendor/jspdf.plugin.autotable.min.js"></script><script src="report-utils.js?v=3"></script>
+  <script src="config.js"></script><script src="app.js?v=3"></script>
 </body>
 </html>

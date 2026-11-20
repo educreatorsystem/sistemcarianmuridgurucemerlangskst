@@ -6,7 +6,9 @@ const colors = {
   HIJAU:['#26b66b','#e8f8ef','#187043'], KUNING:['#efc000','#fff8d6','#806000']
 };
 const PAGE_SIZE = 50;
-let students = [], filtered = [], house = '', token = '', expiry = 0, page = 1;
+let students = [], filtered = [], house = '', token = '', expiry = 0, page = 1, viewMode = 'cards';
+const reportJobs = new Map();
+let pdfUrl = '';
 let bridge, endpoint, ready = false, installEvent, printing = false, loadVersion = 0;
 const channel = String(Date.now()) + Math.random().toString(36).slice(2);
 const requests = new Map();
@@ -67,7 +69,7 @@ async function load() {
 }
 function medIcon(student) {
   const text = student.medical.toLowerCase();
-  return /asma|asthma/.test(text) ? '🫁' : /alahan|alerg|allerg/.test(text) ? '⚠️' : /jantung/.test(text) ? '🫀' : /mata|rabun/.test(text) ? '👁️' : '🩺';
+  return /asma|asthma/.test(text) ? '🫁' : /alahan|alerg|allerg/.test(text) ? '⚠️' : /jantung|ventricular|septal|heart/.test(text) ? '🫀' : /mata|rabun/.test(text) ? '👁️' : '🩺';
 }
 function filterLabels() {
   const labels = [];
@@ -81,6 +83,8 @@ function filterLabels() {
 }
 function clearAdmin() {
   token = ''; expiry = 0; students.forEach(student => delete student.ic);
+  syncExportAccess();
+  revokeReports();
   $('admin').textContent = '🔐 Admin'; $('q').placeholder = 'Cari nama atau rumah sukan…';
   $('modeBadge').textContent = '● PAPARAN GURU'; $('modeBadge').classList.remove('admin');
 }
@@ -99,6 +103,7 @@ function render(resetPage = true) {
   const labels = filterLabels();
   $('activeFilters').innerHTML = (labels.length ? labels : ['Semua murid']).map(label => '<span>' + esc(label) + '</span>').join('');
   document.querySelectorAll('#houses button').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.house === house)));
+  syncExportAccess();
   renderTable();
 }
 function renderTable(allRows = false) {
@@ -113,10 +118,95 @@ function renderTable(allRows = false) {
     const warning = student.match === 'matched' ? '' : `<span class="match-warning">⚑ ${student.match === 'ambiguous' ? 'Nama berulang — semak padanan' : 'Tiada padanan rumah sukan'}</span>`;
     return `<tr><td class="number">${start + index + 1}</td><td><span class="student-name">${esc(student.name)}</span>${warning}</td><td><span class="class-pill">${esc(student.className || 'Belum direkodkan')}</span></td><td><span class="gender-text">${esc(student.gender || '—')}</span></td><td><span class="house-badge" style="--house:${color[0]};--tint:${color[1]};--ink:${color[2]}"><i class="house-dot" aria-hidden="true"></i>${esc(student.house || 'Belum dipadankan')}</span></td><td class="medical-cell${student.sick ? ' medical-attention' : ''}">${student.sick ? `<span class="medical-label"><span aria-hidden="true">${medIcon(student)}</span>Ada sejarah perubatan</span><span class="medical-detail">${esc(student.medical)}</span>` : 'Tiada sejarah direkodkan'}</td>${token ? `<td class="ic-cell">${esc(student.ic || 'Tidak tersedia')}</td>` : ''}</tr>`;
   }).join('');
-  $('results').innerHTML = `<table class="student-table${token ? ' has-ic' : ''}"><caption>Senarai murid SK Sungai Tiram mengikut tapisan yang dipilih</caption><colgroup>${columns.map(col => `<col class="col-${col}">`).join('')}</colgroup><thead><tr>${headers.map(header => '<th scope="col">' + header + '</th>').join('')}</tr></thead><tbody>${body || `<tr><td colspan="${headers.length}"><div class="empty">Tiada murid menepati tapisan ini.</div></td></tr>`}</tbody></table>`;
+  $('results').classList.toggle('cards-view', viewMode === 'cards' && !allRows);
+  $('results').innerHTML = viewMode === 'cards' && !allRows ? (rows.map(cardMarkup).join('') || '<div class="empty">Tiada murid menepati tapisan ini.</div>') : `<table class="student-table${token ? ' has-ic' : ''}"><caption>Senarai murid SK Sungai Tiram mengikut tapisan yang dipilih</caption><colgroup>${columns.map(col => `<col class="col-${col}">`).join('')}</colgroup><thead><tr>${headers.map(header => '<th scope="col">' + header + '</th>').join('')}</tr></thead><tbody>${body || `<tr><td colspan="${headers.length}"><div class="empty">Tiada murid menepati tapisan ini.</div></td></tr>`}</tbody></table>`;
   $('pageInfo').textContent = filtered.length ? `${start + 1}–${Math.min(start + PAGE_SIZE,filtered.length)} · Halaman ${page}/${totalPages}` : '0 murid';
   $('prevPage').disabled = page <= 1; $('nextPage').disabled = page >= totalPages;
+  $('viewCards').setAttribute('aria-pressed', String(viewMode === 'cards'));
+  $('viewTable').setAttribute('aria-pressed', String(viewMode === 'table'));
+  document.querySelector('.scroll-hint').textContent = viewMode === 'cards' ? 'Kad disusun mengikut kelas dan nama murid.' : '↔ Tatal jadual untuk melihat semua kolum pada skrin kecil.';
 }
+function cardMarkup(student) {
+  const female = student.gender === 'PEREMPUAN', male = student.gender === 'LELAKI';
+  const genderClass = female ? 'female' : male ? 'male' : 'unknown';
+  const color = colors[student.house] || ['#8793ab','#eef1f5','#40536e'];
+  const userIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2Z"/></svg>';
+  return `<article class="student-card ${genderClass}"><div class="card-top"><span class="person-tile">${userIcon}</span><h3>${esc(student.name)}</h3></div><div class="card-meta"><span class="card-class">${esc(student.className || 'Belum direkodkan')}</span><span class="gender-badge">${female ? '♀' : male ? '♂' : '•'} ${esc(student.gender || 'Belum direkodkan')}</span></div><span class="card-house" style="--house-bg:${color[0]};--house-ink:${student.house === 'KUNING' ? '#594400' : '#fff'}">${esc(student.house || 'Belum dipadankan')}</span>${token ? `<div class="card-ic"><span>No. K/P</span><strong>${esc(student.ic || 'Tidak tersedia')}</strong></div>` : ''}<div class="card-medical ${student.sick ? 'attention' : 'healthy'}"><span class="medical-emoji" aria-hidden="true">${student.sick ? medIcon(student) : '✓'}</span><div>${student.sick ? '<strong>SEJARAH PERUBATAN</strong>' : ''}<p>${esc(student.sick ? student.medical : 'Tiada sejarah perubatan direkodkan')}</p></div></div>${student.match !== 'matched' ? `<span class="match-warning">⚑ ${student.match === 'ambiguous' ? 'Nama berulang — semak padanan' : 'Tiada padanan rumah sukan'}</span>` : ''}</article>`;
+}
+$('viewCards').onclick = () => { viewMode = 'cards'; render(false); };
+$('viewTable').onclick = () => { viewMode = 'table'; render(false); };
+function isAdmin() { return Boolean(token && Date.now() < expiry); }
+function syncExportAccess() {
+  const active = isAdmin();
+  $('print').hidden = !active;
+  document.body.classList.toggle('admin-print', active);
+  if (!active && $('exportDialog').open) $('exportDialog').close();
+}
+function revokeReports() {
+  for (const [job, record] of reportJobs) { try { record.win?.postMessage({type:'SKST_REPORT_REVOKE', job}, location.origin); } catch {} }
+  reportJobs.clear();
+  if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+  pdfUrl = ''; $('pdfLink').hidden = true; $('pdfLink').removeAttribute('href');
+}
+function snapshot() {
+  if (!isAdmin()) throw Error('Log masuk admin untuk mencetak atau menjana PDF.');
+  render(false);
+  if (!isAdmin()) throw Error('Sesi admin tamat. Sila log masuk semula.');
+  return {createdAt:Date.now(), expiresAt:expiry, labels:filterLabels(), includeIC:true, students:filtered.map(s => ({name:s.name,className:s.className,gender:s.gender,house:s.house,medical:s.medical,sick:s.sick,match:s.match,ic:s.ic || ''}))};
+}
+$('print').onclick = () => {
+  if (!isAdmin()) { clearAdmin(); render(false); return; }
+  if (!filtered.length) { setStatus('Tiada murid untuk dicetak. Semak tapisan yang dipilih.', true); return; }
+  $('exportCount').textContent = filtered.length.toLocaleString('ms-MY') + ' murid mengikut tapisan semasa. Semua halaman dimasukkan.';
+  $('exportStatus').textContent = ''; $('pdfLink').hidden = true;
+  $('sharePdf').hidden = typeof navigator.share !== 'function' || typeof navigator.canShare !== 'function';
+  $('exportDialog').showModal();
+};
+$('closeExport').onclick = () => $('exportDialog').close();
+$('openPrint').onclick = () => {
+  try {
+    const data = snapshot();
+    const job = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const url = new URL('cetak.html', location.href); url.searchParams.set('job', job);
+    const win = window.open(url.href, '_blank');
+    if (!win) throw Error('Paparan cetak tidak dapat dibuka. Gunakan Muat turun PDF.');
+    reportJobs.set(job, {win, data});
+    setTimeout(() => { const pending = reportJobs.get(job); if (pending) pending.data = null; }, 45000);
+    $('exportStatus').textContent = 'Paparan cetak dibuka. Tekan Cetak pada halaman tersebut, atau gunakan Muat turun PDF di sini.';
+  } catch (error) { $('exportStatus').textContent = error.message; }
+};
+window.addEventListener('message', event => {
+  if (event.origin !== location.origin) return;
+  const message = event.data, job = reportJobs.get(message?.job);
+  if (!job || event.source !== job.win) return;
+  if (!isAdmin()) { revokeReports(); return; }
+  if (message.type === 'SKST_REPORT_READY' && job.data) {
+    job.win.postMessage({type:'SKST_REPORT_DATA', job:message.job, snapshot:job.data}, location.origin);
+  } else if (message.type === 'SKST_REPORT_ACK') { job.data = null; }
+});
+function pdfDocument() {
+  const data = snapshot();
+  if (!window.SKST_REPORT) throw Error('Fail PDF belum dimuat. Muat semula aplikasi dan pastikan semua fail github dimuat naik.');
+  return {doc:window.SKST_REPORT.makePdf(data), filename:window.SKST_REPORT.filename(data)};
+}
+$('savePdf').onclick = () => {
+  try {
+    $('exportStatus').textContent = 'Menjana PDF…';
+    const {doc,filename} = pdfDocument(), blob = doc.output('blob');
+    if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+    pdfUrl = URL.createObjectURL(blob);
+    $('pdfLink').href = pdfUrl; $('pdfLink').hidden = false;
+    const link = document.createElement('a'); link.href = pdfUrl; link.download = filename; document.body.append(link); link.click(); link.remove();
+    $('exportStatus').textContent = 'PDF telah dijana. Jika muat turun tidak bermula, tekan Buka PDF yang dijana.';
+  } catch (error) { $('exportStatus').textContent = error.message; }
+};
+$('sharePdf').onclick = async () => {
+  try {
+    const {doc,filename} = pdfDocument(), file = new File([doc.output('blob')],filename,{type:'application/pdf'});
+    if (!navigator.canShare({files:[file]})) throw Error('Peranti ini tidak menyokong perkongsian fail PDF. Gunakan Muat turun PDF.');
+    await navigator.share({files:[file], title:'Senarai murid SK Sungai Tiram'});
+  } catch (error) { if (error.name !== 'AbortError') $('exportStatus').textContent = error.message; }
+};
 $('houses').innerHTML = [['','Semua','#f1f3f8'], ...Object.keys(colors).map(h => [h,h,colors[h][0]])].map(([value,label,color]) => `<button data-house="${value}" title="${label}" aria-label="Rumah ${label}" aria-pressed="false" style="background:${color}">${value ? '' : 'All'}</button>`).join('');
 $('houses').onclick = event => { const button = event.target.closest('button'); if (button) { house = button.dataset.house; render(); } };
 ['q','class','gender','health'].forEach(id => $(id).addEventListener(id === 'q' ? 'input' : 'change', () => render()));
@@ -124,25 +214,20 @@ $('year').onchange = () => { updateClasses(); render(); };
 $('reset').onclick = () => { ['q','year','class','gender','health'].forEach(id => $(id).value = ''); house = ''; updateClasses(); render(); };
 $('generate').onclick = () => {
   render();
-  if (students.length) setStatus('Senarai dijana: ' + filtered.length.toLocaleString('ms-MY') + ' murid. Cetak / PDF akan memasukkan semua hasil tapisan.');
+  if (students.length) setStatus('Senarai dijana: ' + filtered.length.toLocaleString('ms-MY') + ' murid.');
   $('listPanel').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'});
 };
 $('refresh').onclick = load;
 $('prevPage').onclick = () => { page--; render(false); };
 $('nextPage').onclick = () => { page++; render(false); };
 function preparePrint() {
+  if (!isAdmin()) { document.body.classList.remove('admin-print'); return; }
   if (printing) return;
   const oldPage = page; render(false); page = oldPage; printing = true;
-  const labels = filterLabels();
-  $('printinfo').textContent = ['Tarikh: ' + new Date().toLocaleString('ms-MY'), ...(labels.length ? labels : ['Semua murid']), 'Jumlah: ' + filtered.length + ' murid', 'Sorotan merah jambu: ada sejarah perubatan'].join(' · ');
+  $('printinfo').textContent = ['Tarikh: ' + new Date().toLocaleString('ms-MY'), ...filterLabels(), 'Jumlah: ' + filtered.length + ' murid'].join(' · ');
   renderTable(true);
 }
 function finishPrint() { if (printing) { printing = false; render(false); } }
-$('print').onclick = () => {
-  if (!students.length) { setStatus('Muatkan data murid sebelum mencetak.', true); return; }
-  preparePrint();
-  try { window.print(); } catch (error) { finishPrint(); setStatus('Cetakan tidak dapat dibuka. Cuba menu cetak pelayar.', true); }
-};
 window.addEventListener('beforeprint', preparePrint); window.addEventListener('afterprint', finishPrint);
 function logout(remote = true) {
   const previous = token; ++loadVersion; clearAdmin(); render(false);
@@ -157,6 +242,7 @@ $('loginform').onsubmit = async event => {
     const form = new FormData(event.target);
     const response = await api('login', {username:form.get('username'), password:form.get('password')});
     token = response.token; expiry = Date.now() + response.expiresIn * 1000;
+    syncExportAccess();
     $('login').close(); event.target.reset(); $('admin').textContent = '↪ Log keluar';
     $('q').placeholder = 'Cari nama, No. K/P atau rumah sukan…';
     $('modeBadge').textContent = '● MOD ADMIN AKTIF'; $('modeBadge').classList.add('admin');
