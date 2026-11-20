@@ -16,11 +16,19 @@ const CONFIG = Object.freeze({
 });
 
 function doGet() {
-  return HtmlService.createHtmlOutputFromFile('App')
+  var output=HtmlService.createHtmlOutputFromFile('App')
     .setTitle('SK Sungai Tiram | Sistem Carian Murid')
-    // Diperlukan supaya laman GitHub Pages boleh memaparkan web app dalam iframe.
-    // HADKAN Google Apps Script deployment kepada akaun guru; iframe bukan kawalan akses.
+    .addMetaTag('viewport','width=device-width, initial-scale=1, viewport-fit=cover')
+    // Selesa untuk desktop; Android menggunakan paparan terus tanpa iframe pihak ketiga.
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  // Google HtmlService hanya menyokong favicon menggunakan setFaviconUrl().
+  // Letakkan URL ikon PNG awam (contoh GitHub Pages assets/favicon-48.png)
+  // dalam Script Properties: SITE_FAVICON_URL, jika mahu favicon pada halaman /exec.
+  var favicon=PropertiesService.getScriptProperties().getProperty('SITE_FAVICON_URL') || '';
+  if (/^https:\/\/[^\s]+\.png(?:\?[^\s]*)?$/i.test(favicon)) {
+    output.setFaviconUrl(favicon);
+  }
+  return output;
 }
 
 /** Data bootstrap awam: hanya metadata kategori, tanpa nama murid / KP / perubatan. */
@@ -273,3 +281,5 @@ function requireAdmin_(token) {
   if (!validateSession_(token)) throw new Error('Sesi admin tamat. Sila log masuk semula.');
 }
 
+
+/** Versi satu fail Code.gs: tidak memerlukan App.html. */

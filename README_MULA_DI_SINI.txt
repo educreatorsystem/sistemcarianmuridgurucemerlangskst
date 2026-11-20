@@ -1,51 +1,43 @@
-SK SUNGAI TIRAM — VERSI CETAK & REKOD PERUBATAN (20 NOV 2026)
+SISTEM CARIAN MAKLUMAT MURID SK SUNGAI TIRAM
+VERSI ANDROID / TABLET / LOGO PWA – 20 NOVEMBER 2026
 
 PERUBAHAN
-1. Lencana sekolah asal terus kelihatan pada awal halaman, tanpa login atau muat naik.
-2. Fungsi muat naik lencana dipadam sepenuhnya daripada frontend dan backend.
-3. No. K/P: hanya muncul apabila log masuk admin sah; tidak dihantar kepada pengguna biasa.
-4. Rekod perubatan dan emoji 🩺: kelihatan kepada pengguna biasa, kerana pengguna ialah guru.
-5. Tapisan: Tahun, Kelas, Jantina, Rumah Sukan, dan Ada/Tiada Rekod Perubatan, serta carian nama.
-6. CETAK SENARAI / PDF: mencetak SEMUA rekod sepadan, bukan 40 kad pertama; nombor KP hanya masuk cetakan admin.
-7. CETAK PROFIL: pada setiap kad individu, termasuk tanpa admin (tanpa nombor KP).
-8. Label “Tiada rekod perubatan” bukannya mendakwa “murid sihat”.
+1. Pelawat Android/tablet tidak lagi menggunakan iframe ke Apps Script. Pautan GitHub membuka Web App sebagai halaman utama supaya log masuk Google dan paparan lebih serasi. Dalam PWA terpasang, ketuk “Buka Sistem Carian”.
+2. Desktop masih boleh guna iframe, dengan butang alternatif “Buka laman terus” jika iframe disekat.
+3. Loading GitHub dan loading dalam Web App kini menggunakan logo rasmi SK Sungai Tiram tanpa tulisan/logo gantian “SKST”.
+4. Ikon PWA 192px dan 512px, ikon maskable, favicon, apple-touch-icon menggunakan lencana rasmi.
+5. Service Worker v4 mengosongkan cache versi lama dan tidak menyimpan data murid, K/P atau kesihatan.
+6. Rekod kesihatan dapat dilihat oleh pengguna Web App, nombor K/P hanya selepas log masuk admin, cetakan mengikut tapisan masih dikekalkan.
 
-CARA PALING MUDAH: 1 FAIL CODE.GS
-1. Buka projek Apps Script yang digunakan pada masa ini.
-2. Gantikan SEMUA isi Code.gs dengan fail Code.gs di root ZIP ini (bukan apps_script/Code.gs).
-3. Klik Save.
-4. Project Settings > Script properties: ADMIN_USERNAME dan ADMIN_PASSWORD sedia ada boleh dikekalkan.
-5. Deploy > Manage deployments > Edit > New version > Deploy.
-6. Buka URL Web App asal, refresh paksa CTRL+SHIFT+R.
-7. Fail App.html yang tinggal dari versi lama boleh dipadam; versi satu fail TIDAK menggunakannya.
+CARA PASANG (PILIH SALAH SATU BAGI APPS SCRIPT)
+A. PALING MUDAH - SATU FAIL:
+  - Buka Google Apps Script sedia ada.
+  - Gantikan seluruh kandungan Code.gs dengan fail Code.gs di folder utama ZIP ini.
+  - Jangan jalankan loginAdmin melalui butang Run; gunakan laman web untuk log masuk.
+  - Pastikan Script Properties ADMIN_USERNAME / ADMIN_PASSWORD sedia ada tidak dipadam.
+  - Deploy > Manage deployments > Edit > New version > Deploy. Kekalkan URL /exec.
 
-PILIHAN KOD DUA FAIL
-- Gunakan apps_script/Code.gs sebagai Code.gs.
-- Buat fail HTML bernama App dalam Apps Script dan tampal apps_script/App.html.
-- Simpan & deploy New Version. Jangan campurkan Code.gs satu fail dengan Code.gs dua fail.
+B. ALTERNATIF - DUA FAIL:
+  - Salin apps_script/Code.gs ke Code.gs dan apps_script/App.html ke fail HTML bernama App.
+  - Deploy semula versi baharu.
+  - Jangan gunakan cara A dan B serentak.
 
-GITHUB PAGES / PWA
-- Kandungan folder github/ boleh dimuat naik ke root repositori GitHub.
-- URL Web App kekal sama.
-- GitHub Pages PUBLIC tidak menyekat capaian orang luar! GitHub hanya menjadi pembungkus iframe.
-- Lihat cadangan keselamatan di bawah sebelum menerbitkan kepada guru.
+KEMASKINI GITHUB PAGES
+  - Muat naik SEMUA kandungan folder github ke root repositori: index.html, sw.js, manifest.webmanifest, favicon.ico dan folder assets.
+  - Pastikan GitHub Pages menggunakan branch dan folder yang sama seperti sebelumnya.
+  - Refresh Chrome dan jika masih nampak versi lama, padam data laman atau nyahpasang shortcut/PWA lama kemudian pasang semula.
+  - Telefon Android: gunakan Chrome atau Edge terkini. Elak pelayar terbina dalam WhatsApp/Telegram/Facebook.
+  - Jika PWA dilancarkan dari ikon, ketuk “Buka Sistem Carian”. Ini membuka Apps Script sebagai laman utama di pelayar kerana integrasi iframe tidak stabil di sesetengah Android.
 
-AMARAN KESELAMATAN DATA (WAJIB)
-- Tanpa login admin, data perubatan kini boleh dibaca oleh sesiapa yang BERJAYA mengakses Web App.
-- Menyebarkan pautan hanya dalam group guru TIDAK menjadikan pautan sebagai portal tertutup.
-- Jika sekolah menggunakan akaun Google Workspace domain, deploy Apps Script dengan akses HANYA pengguna organisasi / domain sekolah. Jika tetapan organisasi tiada, jangan terbit rekod perubatan melalui pautan awam; gunakan platform yang memerlukan log masuk guru.
-- Sesetengah pelayar menyekat iframe Google Apps Script yang memerlukan autentikasi; jika paparan GitHub tidak berfungsi, buka Web App terus selepas log masuk akaun guru.
-- Nyahterbit dua CSV melalui File > Share > Publish to web (Stop publishing) dan pastikan Sheet hanya dikongsi kepada pihak yang dibenarkan. CSV diterbitkan secara awam akan memintas semua kawalan portal.
-- Jangan simpan kata laluan admin atau export perubatan murid di GitHub. Tukar kata laluan kepada kata laluan baharu yang kuat.
-- Cetakan dan PDF adalah sensitif; simpan di tempat selamat dan jangan edarkan sewenang-wenangnya.
+FAVICON GOOGLE APPS SCRIPT /exec (PILIHAN)
+  - Lencana secara automatik digunakan untuk laman GitHub, skrin loading dan ikon PWA.
+  - Google Apps Script mengabaikan favicon dalam HTML. Untuk tab /exec, selepas menerbitkan laman GitHub dan mempunyai URL awam sebenar, tambah Script Property SITE_FAVICON_URL = HTTPS URL kepada assets/favicon-48.png milik repositori anda.
+  - Contoh format (GANTIKAN nama akaun dan repositori sebenar): https://<akaun>.github.io/<repo>/assets/favicon-48.png
+  - Jangan tulis URL contoh itu bulat-bulat. Tanpa tetapan ini, laman tetap berfungsi.
 
-UJIAN
-- Sahkan logo kelihatan sebelum login; fungsi upload tiada.
-- Taip nama murid; perubatan terpapar, No. K/P tiada.
-- Tapisan “Ada rekod perubatan”, klik Cetak Senarai/PDF.
-- Pilih Kelas sahaja dan cetak; bilangan baris cetak hendaklah sama dengan jumlah padanan walaupun >40.
-- Login admin kemudian cetak; No. K/P dipaparkan hanya jika admin telah disahkan oleh pelayan.
-- Logout: No. K/P tidak lagi terpapar atau dicetak.
-
-URL WEB APP:
-https://script.google.com/macros/s/AKfycby5UJhujNUfQylBXo-slnRuMGB-J24uSIqNQ2CmSHBjD_B7FYx1LTKdhsdqSZSqpxiv/exec
+KESELAMATAN DATA (PENTING)
+  - Github Pages TIDAK mengehadkan akses kepada guru; URL Apps Script boleh diakses terus jika deploy kepada Anyone.
+  - Oleh sebab sejarah perubatan ditampilkan sebelum admin login, hadkan capaian Web App kepada akaun guru/domain sekolah di Google Workspace atau gunakan mekanisme pengesahan guru khusus.
+  - Nyahterbit CSV awam yang memuatkan nombor kad pengenalan dan sejarah perubatan.
+  - Tiada data murid disimpan dalam cache PWA/service worker.
+  - Data diuji secara statik/simulasi; pengujian Google sebenar perlu dilakukan selepas deploy.

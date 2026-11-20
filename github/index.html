@@ -1,50 +1,86 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0b1427">
-  <meta name="description" content="Sistem carian maklumat murid SK Sungai Tiram. PWA sekolah dengan cetakan senarai dan tapisan perubatan; akses data mesti dihadkan kepada guru.">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
-  <link rel="apple-touch-icon" href="./assets/icon-192.png">
-  <title>SK Sungai Tiram | Sistem Carian Murid</title>
-  <style>
-    *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#081021;color:#f4f7ff;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}body{overflow:hidden}
-    #app{width:100%;height:100%;height:100dvh;border:none;display:block;background:#081021;position:relative;z-index:2}
-    #splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:3;background:radial-gradient(ellipse 600px 400px at 50% 25%,#1e2c47,#09111f 70%);transition:opacity .45s ease,visibility .45s ease;padding:25px;text-align:center}
-    #splash.done{opacity:0;visibility:hidden;pointer-events:none}.logo{height:82px;width:82px;background:linear-gradient(145deg,#fff0bd,#bb843a,#f6da91);display:grid;place-items:center;border-radius:25px;color:#1a2639;font-size:26px;font-weight:900;letter-spacing:-1px;box-shadow:0 0 50px #daa95d35;overflow:hidden}
-    h1{font-size:25px;letter-spacing:-.8px;margin:23px 0 5px}p{color:#9eb0c9;font-size:13px;max-width:450px;line-height:1.7}.track{height:3px;width:160px;background:#ffffff22;overflow:hidden;border-radius:3px;margin-top:22px}.bar{height:100%;width:45%;background:#e2b963;animation:load 1.4s infinite ease-in-out;border-radius:3px}@keyframes load{0%{transform:translateX(-150%)}100%{transform:translateX(370%)}}
-    .open{display:inline-block;border:1px solid #dcb46966;border-radius:12px;padding:12px 15px;text-decoration:none;color:#f0ce8c;font-weight:750;font-size:12px;margin-top:23px;background:#e3b6610c}.open:hover{background:#e3b66124}.direct-fallback{position:fixed;z-index:4;bottom:12px;right:12px;color:#ffe3ac;background:#0d1a30e8;border:1px solid #dcb46955;border-radius:10px;padding:8px 10px;font-size:11px;font-weight:750;text-decoration:none;box-shadow:0 5px 22px #0003;opacity:.85}.direct-fallback:hover{opacity:1;background:#253451}
-    #offline{position:fixed;z-index:5;inset:0;display:none;align-items:center;justify-content:center;padding:30px;text-align:center;background:#0a1428}#offline.show{display:flex}#offline .box{max-width:470px}#offline h2{font-size:22px;margin:14px 0}#offline button{color:#172034;background:linear-gradient(110deg,#fce9bc,#d7a85c);border:0;border-radius:11px;padding:12px 17px;font-weight:800;margin-top:15px;cursor:pointer}
-    @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b182d">
+<meta name="description" content="Sistem Carian Maklumat Murid Sekolah Kebangsaan Sungai Tiram. Untuk kegunaan dalaman guru.">
+<title>Sistem Carian Murid | SK Sungai Tiram</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./favicon.ico" sizes="any">
+<link rel="icon" href="./assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="./assets/favicon-48.png" type="image/png" sizes="48x48">
+<link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Carian Murid">
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#091325;color:#f3f7ff}body{overflow:hidden}
+#portal{position:fixed;inset:0;width:100%;height:100%;height:100dvh;border:0;background:#091325;display:none}
+#portal.active{display:block}
+#screen{position:fixed;inset:0;background:radial-gradient(circle at 50% 23%,#283d5f 0,#101e34 42%,#081321 85%);z-index:3;display:flex;align-items:center;justify-content:center;padding:22px;text-align:center;transition:opacity .45s ease,visibility .45s ease}
+#screen.dismiss{visibility:hidden;opacity:0;pointer-events:none}
+.card{width:min(470px,100%);display:flex;align-items:center;flex-direction:column}
+.logo-frame{height:160px;width:160px;display:grid;place-items:center;border:1px solid #d6b16a33;background:#f8e9c008;border-radius:31px;box-shadow:0 0 75px #cba56521;flex:none}.logo-frame img{height:92%;width:92%;display:block;object-fit:contain}
+h1{font-size:clamp(22px,5vw,29px);font-weight:850;letter-spacing:-.9px;line-height:1.2;margin:25px 0 7px;background:linear-gradient(100deg,#fff4d3,#e3bd7a,#fff2c4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.subtitle{font-size:14px;color:#bac9e1;margin:0;line-height:1.7}.status{font-size:12px;color:#a8bcd6;margin:22px 0 6px;line-height:1.6}
+.track{width:180px;height:4px;border-radius:3px;background:#ffffff20;overflow:hidden;margin-top:14px}.bar{width:43%;height:100%;border-radius:4px;background:linear-gradient(90deg,#b98b42,#ffe8b5);animation:loading 1.3s ease-in-out infinite}@keyframes loading{from{transform:translateX(-120%)}to{transform:translateX(360%)}}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px;width:100%}.primary,.secondary{min-height:46px;border-radius:12px;padding:12px 17px;font-weight:750;text-decoration:none;font-size:14px;line-height:1.4;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.primary{background:linear-gradient(115deg,#ffedbd,#d7a75b);color:#19243a;border:0;box-shadow:0 9px 23px #b7863836}.secondary{border:1px solid #d9b56b60;background:#b17f2614;color:#f9dfac}.secondary:hover,.primary:hover{filter:brightness(1.1)}
+.help{font-size:12px;color:#b0c0d9;line-height:1.8;margin:21px 0 0;max-width:410px}
+#quickOpen{position:fixed;bottom:14px;right:14px;z-index:2;color:#ffe1a0;background:#142943;border:1px solid #d6b06f88;border-radius:12px;padding:11px 14px;font-weight:750;text-decoration:none;font-size:12px;box-shadow:0 6px 25px #0005;display:none}#quickOpen.show{display:block}
+@media(max-width:600px){.logo-frame{width:138px;height:138px}.actions{flex-direction:column}.primary,.secondary{width:100%}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
 </head>
 <body>
-  <!-- URL Apps Script yang telah diberikan. Jangan letak kata laluan di fail GitHub. -->
-  <iframe
-    id="app"
-    title="Sistem Carian Maklumat Murid SK Sungai Tiram"
-    src="https://script.google.com/macros/s/AKfycby5UJhujNUfQylBXo-slnRuMGB-J24uSIqNQ2CmSHBjD_B7FYx1LTKdhsdqSZSqpxiv/exec"
-    referrerpolicy="strict-origin-when-cross-origin"
-    allow="clipboard-write"
-  ></iframe>
-  <a class="direct-fallback" href="https://script.google.com/macros/s/AKfycby5UJhujNUfQylBXo-slnRuMGB-J24uSIqNQ2CmSHBjD_B7FYx1LTKdhsdqSZSqpxiv/exec" target="_blank" rel="noopener noreferrer" aria-label="Buka Apps Script secara langsung">Buka terus ↗</a>
-  <div id="splash" aria-live="polite"><div class="logo"><img src="./assets/skst-logo.png" alt="Lencana SK Sungai Tiram" style="width:100%;height:100%;object-fit:contain"/></div><h1>Sistem Carian Murid</h1><p>SK Sungai Tiram · Menyambungkan portal ke Google Sheet melalui Apps Script.</p><div class="track"><div class="bar"></div></div><a class="open" href="https://script.google.com/macros/s/AKfycby5UJhujNUfQylBXo-slnRuMGB-J24uSIqNQ2CmSHBjD_B7FYx1LTKdhsdqSZSqpxiv/exec" target="_blank" rel="noopener noreferrer">Buka sistem secara langsung</a></div>
-  <div id="offline"><div class="box"><div class="logo" style="margin:auto"><img src="./assets/skst-logo.png" alt="Lencana SK Sungai Tiram" style="width:100%;height:100%;object-fit:contain"/></div><h2>Sambungan internet diperlukan</h2><p>PWA boleh dipasang, tetapi carian murid mesti menggunakan internet untuk mendapatkan data terkini. Tiada data perubatan atau kad pengenalan disimpan secara luar talian.</p><button type="button" onclick="location.reload()">Cuba Lagi</button></div></div>
-  <script>
-    'use strict';
-    const frame=document.getElementById('app');
-    const splash=document.getElementById('splash');
-    const offline=document.getElementById('offline');
-    frame.addEventListener('load',()=>splash.classList.add('done'));
-    const checkOnline=()=>{offline.classList.toggle('show',!navigator.onLine);if(navigator.onLine)frame.src=frame.getAttribute('src');};
-    window.addEventListener('offline',()=>offline.classList.add('show'));
-    window.addEventListener('online',checkOnline);
-    if(!navigator.onLine)offline.classList.add('show');
-    if('serviceWorker' in navigator && location.protocol==='https:'){
-      window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{}));
-    }
-  </script>
+<iframe id="portal" title="Sistem Carian Maklumat Murid SK Sungai Tiram" referrerpolicy="strict-origin-when-cross-origin" allow="clipboard-write"></iframe>
+<a id="quickOpen" href="https://script.google.com/macros/s/AKfycby5UJhujNUfQylBXo-slnRuMGB-J24uSIqNQ2CmSHBjD_B7FYx1LTKdhsdqSZSqpxiv/exec" target="_self">Buka laman terus</a>
+<div id="screen" role="status" aria-live="polite"><main class="card">
+  <div class="logo-frame"><img src="./assets/school-logo.png" alt="Lencana Sekolah Kebangsaan Sungai Tiram" width="145" height="145"></div>
+  <h1>Sistem Carian Maklumat Murid</h1>
+  <p class="subtitle">Sekolah Kebangsaan Sungai Tiram</p>
+  <div class="track" aria-hidden="true"><div class="bar"></div></div>
+  <p id="status" class="status">Menghubungkan sistem…</p>
+  <div class="actions"><a id="openDirect" class="primary" href="https://script.google.com/macros/s/AKfycby5UJhujNUfQylBXo-slnRuMGB-J24uSIqNQ2CmSHBjD_B7FYx1LTKdhsdqSZSqpxiv/exec" target="_self">Buka Sistem Carian</a><button id="copyLink" class="secondary" type="button">Salin Pautan</button></div>
+  <p id="help" class="help" hidden>Jika pelayar dalam WhatsApp atau aplikasi lain gagal membuka sistem, salin pautan dan buka menggunakan Chrome yang telah dikemas kini.</p>
+</main></div>
+<script>
+(function(){
+'use strict';
+var APP_URL='https://script.google.com/macros/s/AKfycby5UJhujNUfQylBXo-slnRuMGB-J24uSIqNQ2CmSHBjD_B7FYx1LTKdhsdqSZSqpxiv/exec';
+var frame=document.getElementById('portal');
+var screen=document.getElementById('screen');
+var status=document.getElementById('status');
+var help=document.getElementById('help');
+var mobile=/Android|iPhone|iPad|iPod|Silk|Kindle|Tablet|webOS|SamsungBrowser/i.test(navigator.userAgent||'');
+var standalone=(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+var timer;
+function notice(text){status.textContent=text;help.hidden=false;}
+function ready(){screen.classList.add('dismiss');document.getElementById('quickOpen').classList.add('show');if(timer)clearTimeout(timer);}
+if(mobile){
+ notice(standalone?'Ketuk butang di bawah untuk membuka sistem dalam pelayar Chrome.':'Membuka sistem terus untuk keserasian Android dan tablet…');
+ // Safari / Chrome embedded Google Apps Script frames sometimes blocked by cross-site cookies.
+ // For phones/tablets do not embed external authentication: use top-level navigation.
+ if(!standalone){timer=setTimeout(function(){window.location.assign(APP_URL);},1100);}
+} else {
+ frame.classList.add('active');frame.src=APP_URL;
+ frame.addEventListener('load',function(){
+   // Load can fire even when Google responds with an error page; direct fallback always remains.
+   ready();
+ });
+ timer=setTimeout(function(){notice('Sistem mengambil masa lebih lama. Jika paparan kosong, pilih “Buka Sistem Carian”.');document.getElementById('quickOpen').classList.add('show');},9500);
+}
+window.addEventListener('message',function(event){
+ if(event && event.data && event.data.kind==='skst-portal-ready' && /(^|\.)googleusercontent\.com$|(^|\.)google\.com$/.test((function(){try{return new URL(event.origin).hostname}catch(e){return ''}})()))ready();
+});
+document.getElementById('copyLink').addEventListener('click',function(){
+ function done(){notice('Pautan disalin. Tampal ke Chrome untuk membuka sistem.');}
+ if(navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(APP_URL).then(done,function(){prompt('Salin pautan berikut:',APP_URL);});}
+ else {prompt('Salin pautan berikut:',APP_URL);}
+});
+if('serviceWorker' in navigator && location.protocol==='https:'){
+ window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(function(reg){if(reg.update)reg.update();}).catch(function(){});});
+}
+})();
+</script>
 </body>
 </html>
