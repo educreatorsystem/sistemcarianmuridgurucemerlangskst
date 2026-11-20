@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4.1">
   <title>Carian Murid • SK Sungai Tiram</title>
 </head>
 <body>
@@ -32,6 +32,7 @@
   </header>
   <main class="app-shell">
     <section class="welcome-strip"><span class="welcome-icon" aria-hidden="true">🌈</span><div><strong>Kenali murid, prihatin bersama.</strong><span>Maklumat murid untuk rujukan dan tindakan guru SK Sungai Tiram.</span></div><span id="modeBadge" class="mode-badge">● PAPARAN GURU</span></section>
+<section id="connectionBanner" class="connection-banner loading" aria-live="polite"><span id="connectionMessage">Memuatkan sambungan rekod sekolah…</span><button id="retryConnection" class="btn-secondary" hidden>Cuba semula</button></section>
     <section id="stats" class="stats" aria-label="Ringkasan data"></section>
     <section class="panel search-panel" aria-labelledby="searchTitle">
       <div class="section-label" id="searchTitle">CARIAN PANTAS</div>
@@ -57,12 +58,15 @@
       <div class="table-scroll" id="results" tabindex="0" role="region" aria-label="Senarai murid"><div class="empty">Memuatkan senarai murid…</div></div>
       <div class="table-bottom"><span class="scroll-hint">Kad disusun mengikut kelas dan nama murid.</span><div class="pagination" id="pagination"><button id="prevPage" aria-label="Halaman sebelumnya" disabled>←</button><span id="pageInfo">—</span><button id="nextPage" aria-label="Halaman seterusnya" disabled>→</button></div></div>
     </section>
-    <footer><strong>SK SUNGAI TIRAM</strong> · ILMU PANDUAN HIDUP<br><span>Kegunaan guru · “Tiada sejarah direkodkan” merujuk rekod sumber, bukan pengesahan kesihatan.</span></footer>
+    <footer><strong>SK SUNGAI TIRAM</strong> · ILMU PANDUAN HIDUP · <b id="buildVersion">Versi 4.1</b><br><span>Kegunaan guru · “Tiada sejarah direkodkan” merujuk rekod sumber, bukan pengesahan kesihatan.</span></footer>
   </main>
   <dialog id="login"><form id="loginform"><span class="icon-tile violet" aria-hidden="true">🔐</span><h2>Log masuk admin</h2><p>No. K/P hanya dipaparkan sepanjang sesi admin.</p><label>Nama pengguna<input name="username" autocomplete="username" required></label><label>Kata laluan<input name="password" type="password" autocomplete="current-password" required></label><p id="loginerror" role="alert"></p><div class="dialog-actions"><button type="button" id="cancel" class="btn-secondary">Batal</button><button class="btn-primary" id="submit">Log masuk</button></div></form></dialog>
   <dialog id="exportDialog"><div class="export-heading"><span class="icon-tile violet" aria-hidden="true">🖨️</span><h2>Cetak &amp; PDF</h2><p id="exportCount"></p></div><p class="export-help">Untuk telefon, muat turun PDF untuk disimpan atau dicetak melalui pembaca PDF.</p><div class="export-actions"><button id="openPrint" class="btn-secondary">🖨️ Buka paparan cetak</button><button id="savePdf" class="btn-primary">↓ Muat turun PDF</button><button id="sharePdf" class="btn-secondary" hidden>↗ Kongsi / cetak PDF</button></div><p id="exportStatus" role="status" aria-live="polite"></p><a id="pdfLink" class="pdf-ready" hidden target="_blank" rel="noopener">Buka PDF yang dijana</a><div class="dialog-actions"><button id="closeExport" class="btn-secondary">Tutup</button></div></dialog>
   <p id="printBlocked">Cetakan tersedia dalam mod admin sahaja.</p>
-  <script src="vendor/jspdf.umd.min.js"></script><script src="vendor/jspdf.plugin.autotable.min.js"></script><script src="report-utils.js?v=3"></script>
-  <script src="config.js"></script><script src="app.js?v=3"></script>
+  <script>
+  window.addEventListener('error',function(){if(!window.SKST_APP_STARTED){var message=document.getElementById('connectionMessage');if(message)message.textContent='Aplikasi belum dapat dimuat. Muat semula halaman atau kemas kini pelayar.';var banner=document.getElementById('connectionBanner');if(banner)banner.className='connection-banner error';}});
+  </script>
+  <script src="compat.js?v=4.1" defer></script><script src="config.js?v=4.1" defer></script><script src="data.js?v=4.1" defer></script><script src="app.js?v=4.1" defer></script>
+  <script src="vendor/jspdf.umd.min.js" defer></script><script src="vendor/jspdf.plugin.autotable.min.js" defer></script><script src="report-utils.js?v=4.1" defer></script>
 </body>
 </html>
