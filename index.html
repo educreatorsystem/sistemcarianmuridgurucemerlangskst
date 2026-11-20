@@ -1,2 +1,63 @@
-<!doctype html><html lang="ms"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b35"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="assets/icon-180.png"><link rel="icon" href="assets/icon-192.png"><link rel="stylesheet" href="styles.css"><title>Carian Murid • SK Sungai Tiram</title>
-<body><main><header><img src="assets/logo.png" alt="Lencana SK Sungai Tiram"><div><small>PORTAL MAKLUMAT GURU</small><h1>Sistem Carian Murid</h1><p>SK Sungai Tiram · Pasir Gudang, Johor</p></div><nav><button id="install" hidden>＋ Pasang aplikasi</button><button id="admin">🔐 Admin</button></nav></header><section class="hero"><div><span class="eyebrow">SATU CARIAN, SEMUA MAKLUMAT</span><h2>Kenali murid.<br><em>Prihatin bersama.</em></h2><p>Maklumat kelas, rumah sukan dan kesihatan dalam satu paparan.</p></div><div class="seal">✦<span>ILMU PANDUAN HIDUP</span></div></section><section id="stats" class="stats"></section><section class="panel search"><label for="q">⌕ Carian murid</label><input id="q" placeholder="Cari nama atau rumah sukan…" autocomplete="off"></section><section class="panel filters"><div class="row"><h3>⚑ Tapisan</h3><button id="reset">↻ Reset tapisan</button></div><div class="filtergrid"><label>Tahun<select id="year"><option value="">Semua tahun</option></select></label><label>Kelas<select id="class"><option value="">Semua kelas</option></select></label><label>Jantina<select id="gender"><option value="">Semua</option><option>LELAKI</option><option>PEREMPUAN</option></select></label><fieldset><legend>Rumah sukan</legend><div id="houses"></div></fieldset><label>Sejarah perubatan<select id="health"><option value="">Semua murid</option><option value="sick">Ada sejarah perubatan</option><option value="healthy">Tiada sejarah direkodkan</option><option value="unmatched">Padanan perlu semakan</option></select></label></div></section><div class="row toolbar"><div><h3>Direktori murid</h3><p id="count" aria-live="polite">Menghubungkan data…</p></div><div><button id="refresh">↻ Muat semula</button> <button id="print" class="primary">▣ Cetak / PDF</button></div></div><p id="status" role="status"></p><p id="printinfo"></p><section id="results"></section><footer>Kegunaan guru SK Sungai Tiram · Data terus daripada rekod sekolah<br><small>“Tiada sejarah direkodkan” merujuk rekod yang kosong atau ditandakan tiada, bukan pengesahan kesihatan.</small></footer></main><dialog id="login"><form id="loginform"><h2>Log masuk admin</h2><p>No. K/P hanya dipaparkan sepanjang sesi admin.</p><label>Nama pengguna<input name="username" autocomplete="username" required></label><label>Kata laluan<input name="password" type="password" autocomplete="current-password" required></label><p id="loginerror" role="alert"></p><div class="row"><button type="button" id="cancel">Batal</button><button class="primary" id="submit">Log masuk</button></div></form></dialog><script src="config.js"></script><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#5b4ee8">
+  <meta name="description" content="Direktori kelas, rumah sukan dan rekod perubatan murid SK Sungai Tiram untuk rujukan guru.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="SKST Murid">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icon-180.png">
+  <link rel="icon" href="assets/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=2">
+  <title>Carian Murid • SK Sungai Tiram</title>
+</head>
+<body>
+  <div class="page-orb orb-one" aria-hidden="true"></div>
+  <div class="page-orb orb-two" aria-hidden="true"></div>
+  <div class="page-orb orb-three" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="header-decoration" aria-hidden="true">✦</div>
+    <div class="brand-wrap">
+      <div class="logo-halo"><img src="assets/logo.png" alt="Lencana SK Sungai Tiram" width="82" height="82"></div>
+      <div class="brand-copy"><div class="school-name">SEKOLAH KEBANGSAAN SUNGAI TIRAM</div><h1>SISTEM CARIAN MURID</h1><p>Kelas, rumah sukan &amp; rekod perubatan</p></div>
+    </div>
+    <nav aria-label="Tindakan aplikasi"><button id="install" class="btn-light" hidden>＋ Pasang aplikasi</button><button id="admin" class="btn-light">🔐 Admin</button></nav>
+  </header>
+  <main class="app-shell">
+    <section class="welcome-strip"><span class="welcome-icon" aria-hidden="true">🌈</span><div><strong>Kenali murid, prihatin bersama.</strong><span>Maklumat murid untuk rujukan dan tindakan guru SK Sungai Tiram.</span></div><span id="modeBadge" class="mode-badge">● PAPARAN GURU</span></section>
+    <section id="stats" class="stats" aria-label="Ringkasan data"></section>
+    <section class="panel search-panel" aria-labelledby="searchTitle">
+      <div class="section-label" id="searchTitle">CARIAN PANTAS</div>
+      <div class="search-field"><span aria-hidden="true">⌕</span><input id="q" aria-label="Carian murid" placeholder="Cari nama atau rumah sukan…" autocomplete="off"><kbd aria-hidden="true">CARI</kbd></div>
+    </section>
+    <section class="panel filters" aria-labelledby="filterTitle">
+      <div class="section-heading"><div class="heading-title"><span class="icon-tile violet" aria-hidden="true">⚑</span><h2 id="filterTitle">Tapisan murid</h2></div><button id="reset" class="btn-text">↻ Reset tapisan</button></div>
+      <div class="filtergrid">
+        <label><span class="label-icon purple" aria-hidden="true">▦</span> Tahun<select id="year"><option value="">Semua tahun</option></select></label>
+        <label><span class="label-icon blue" aria-hidden="true">▥</span> Kelas<select id="class"><option value="">Semua kelas</option></select></label>
+        <label><span class="label-icon teal" aria-hidden="true">♙</span> Jantina<select id="gender"><option value="">Semua</option><option>LELAKI</option><option>PEREMPUAN</option></select></label>
+        <fieldset><legend><span class="label-icon pink" aria-hidden="true">⚑</span> Rumah sukan</legend><div id="houses"></div></fieldset>
+        <label class="health-filter"><span class="label-icon coral" aria-hidden="true">♡</span> Sejarah perubatan<select id="health"><option value="">Semua murid</option><option value="sick">Ada sejarah perubatan</option><option value="healthy">Tiada sejarah direkodkan</option><option value="unmatched">Padanan perlu semakan</option></select></label>
+      </div>
+      <div class="filter-bottom"><span class="filter-tip">Gabungkan tapisan untuk mendapatkan senarai yang diperlukan.</span><button id="generate" class="btn-warm">📋 Jana senarai</button></div>
+    </section>
+    <section class="list-panel" id="listPanel" aria-labelledby="listTitle">
+      <div class="list-heading"><div><span class="section-label">DIREKTORI SEKOLAH</span><h2 id="listTitle">Senarai murid</h2><p id="count" aria-live="polite">Menghubungkan data…</p></div><div class="list-actions"><button id="refresh" class="btn-secondary">↻ Muat semula</button><button id="print" class="btn-primary">🖨️ Cetak / PDF</button></div></div>
+      <div class="list-meta"><div id="activeFilters" class="active-filters" aria-label="Tapisan aktif"><span>Semua murid</span></div><span class="medical-key"><i aria-hidden="true"></i> Ada sejarah perubatan</span></div>
+      <p id="status" class="status-line" role="status">Memulakan sambungan sekolah…</p>
+      <p id="printinfo"></p>
+      <div class="table-scroll" id="results" tabindex="0" role="region" aria-label="Jadual senarai murid. Tatal mendatar untuk melihat semua kolum."><div class="empty">Memuatkan senarai murid…</div></div>
+      <div class="table-bottom"><span class="scroll-hint">↔ Tatal jadual untuk melihat semua kolum pada skrin kecil.</span><div class="pagination" id="pagination"><button id="prevPage" aria-label="Halaman sebelumnya" disabled>←</button><span id="pageInfo">—</span><button id="nextPage" aria-label="Halaman seterusnya" disabled>→</button></div></div>
+    </section>
+    <footer><strong>SK SUNGAI TIRAM</strong> · ILMU PANDUAN HIDUP<br><span>Kegunaan guru · “Tiada sejarah direkodkan” merujuk rekod sumber, bukan pengesahan kesihatan.</span></footer>
+  </main>
+  <dialog id="login"><form id="loginform"><span class="icon-tile violet" aria-hidden="true">🔐</span><h2>Log masuk admin</h2><p>No. K/P hanya dipaparkan sepanjang sesi admin.</p><label>Nama pengguna<input name="username" autocomplete="username" required></label><label>Kata laluan<input name="password" type="password" autocomplete="current-password" required></label><p id="loginerror" role="alert"></p><div class="dialog-actions"><button type="button" id="cancel" class="btn-secondary">Batal</button><button class="btn-primary" id="submit">Log masuk</button></div></form></dialog>
+  <script src="config.js"></script><script src="app.js?v=2"></script>
+</body>
+</html>

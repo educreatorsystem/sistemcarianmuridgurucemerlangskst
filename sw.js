@@ -1,1 +1,9 @@
-const CACHE='skst-shell-v1';const FILES=['./','./index.html','./styles.css','./config.js','./app.js','./manifest.webmanifest','./assets/logo.png','./assets/icon-192.png','./assets/icon-512.png','./assets/icon-180.png'];self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)));self.skipWaiting()});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('skst-shell-')&&k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==location.origin)return;e.respondWith(fetch(e.request).catch(()=>caches.match(e.request).then(r=>r||new Response('Sila sambung internet untuk memuatkan aplikasi.',{status:503}))))});
+const CACHE = 'skst-shell-v2-pastel-table';
+const FILES = ['./','./index.html','./styles.css?v=2','./config.js','./app.js?v=2','./manifest.webmanifest','./assets/logo.png','./assets/icon-192.png','./assets/icon-512.png','./assets/icon-180.png'];
+self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES))); self.skipWaiting(); });
+self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('skst-shell-') && key !== CACHE).map(key => caches.delete(key))))); self.clients.claim(); });
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  if (event.request.method !== 'GET' || url.origin !== location.origin) return;
+  event.respondWith(fetch(event.request).catch(() => caches.match(event.request).then(response => response || new Response('Sila sambung internet untuk memuatkan aplikasi.', {status:503}))));
+});
