@@ -1,14 +1,26 @@
-// Cache only the public PWA shell and school crest, not student/health/IC records.
-var CACHE_NAME='skst-shell-android-compat-v4';
-var ASSETS=['./','./index.html','./manifest.webmanifest','./favicon.ico','./assets/school-logo.png','./assets/icon-192.png','./assets/icon-512.png','./assets/maskable-192.png','./assets/maskable-512.png','./assets/apple-touch-icon.png','./assets/favicon-32.png','./assets/favicon-48.png'];
-self.addEventListener('install',function(event){event.waitUntil(caches.open(CACHE_NAME).then(function(c){return c.addAll(ASSETS);}).then(function(){return self.skipWaiting();}));});
-self.addEventListener('activate',function(event){event.waitUntil(caches.keys().then(function(keys){return Promise.all(keys.filter(function(key){return key!==CACHE_NAME;}).map(function(key){return caches.delete(key);}));}).then(function(){return self.clients.claim();}));});
-self.addEventListener('fetch',function(event){
- var req=event.request;if(req.method!=='GET')return;
- var u=new URL(req.url);if(u.origin!==self.location.origin)return; // No cache for Google Apps Script.
- var urls=ASSETS.map(function(path){return new URL(path,self.registration.scope).pathname;});
- if(urls.indexOf(u.pathname)===-1)return;
- var isHTML=u.pathname===new URL('./',self.registration.scope).pathname||u.pathname===new URL('./index.html',self.registration.scope).pathname;
- if(isHTML){event.respondWith(fetch(req,{cache:'no-store'}).then(function(response){if(response.ok){var clone=response.clone();caches.open(CACHE_NAME).then(function(c){c.put(req,clone);});}return response;}).catch(function(){return caches.match(req); }));return;}
- event.respondWith(caches.match(req).then(function(hit){return hit||fetch(req).then(function(resp){if(resp.ok){var copy=resp.clone();caches.open(CACHE_NAME).then(function(c){c.put(req,copy);});}return resp;});}));
+/* Cache isolated to launcher and crest; no student data stored on device. */
+const CACHE_NAME='carian-sekolah-crest-v20261120v7';
+const STATIC=["./", "./index.html", "./manifest-20261120v7.webmanifest", "./favicon.ico", "./assets/lencana-sekolah-20261120v7.png", "./assets/logo-favicon-48-20261120v7.png", "./assets/logo-apple-180-20261120v7.png", "./assets/logo-pwa-192-20261120v7.png", "./assets/logo-pwa-512-20261120v7.png", "./assets/logo-maskable-192-20261120v7.png", "./assets/logo-maskable-512-20261120v7.png"];
+self.addEventListener('install',event=>{
+ event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(STATIC)).then(()=>self.skipWaiting()));
+});
+self.addEventListener('activate',event=>{
+ event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));
+});
+self.addEventListener('fetch',event=>{
+ let req=event.request;
+ if(req.method!=='GET')return;
+ let url=new URL(req.url);
+ if(url.origin!==self.location.origin)return; // never intercept Google Apps Script requests.
+ if(req.mode==='navigate' || url.pathname.endsWith('/config.js')){
+  event.respondWith(fetch(req,{cache:'no-store'}).then(resp=>{
+   if(resp.ok){let copy=resp.clone();caches.open(CACHE_NAME).then(c=>c.put(req,copy));}
+   return resp;
+  }).catch(()=>caches.match(req).then(cached=>cached||caches.match('./index.html'))));
+  return;
+ }
+ event.respondWith(caches.match(req,{ignoreSearch:true}).then(hit=>hit||fetch(req).then(resp=>{
+   if(resp.ok){let copy=resp.clone();caches.open(CACHE_NAME).then(c=>c.put(req,copy));}
+   return resp;
+ })));
 });

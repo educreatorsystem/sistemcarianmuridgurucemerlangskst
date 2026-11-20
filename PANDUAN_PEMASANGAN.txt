@@ -1,0 +1,72 @@
+SISTEM CARIAN MAKLUMAT MURID — SK SUNGAI TIRAM
+VERSI LOGO + ANDROID 2026-11-20 v7
+==============================================
+
+PERKARA YANG TELAH DIBETULKAN
+1. Lencana sekolah diberikan terus dalam skrin loading (HTML awal, tidak menunggu login atau JavaScript).
+2. Tiada paparan huruf/logo gantian “SKST” sewaktu loading; skrin hanya lencana dan bar progres.
+3. Lencana sekolah dijadikan icon PWA (192 dan 512), adaptive/maskable, Apple Touch Icon dan favicon.
+4. Fail ikon PWA baharu bernama unik dan identiti PWA versi baharu untuk elak ikon lama tersimpan.
+5. Laman GitHub tidak lagi mempunyai iframe atau redirect automatik ke Apps Script. Ini mengurangkan gangguan
+   aplikasi Google Drive yang mengambil alih URL script.google.com di sesetengah Android.
+6. Butang Buka dengan Chrome (Android intent) dan Salin Pautan untuk kaedah alternatif.
+7. Carian, padanan nama, tapisan, rekod perubatan dan fungsi cetak asal dikekalkan pada Apps Script.
+
+A. GOOGLE APPS SCRIPT
+1. Dalam editor projek Apps Script sedia ada, buka Code.gs.
+2. Ganti SEMUA kod lama dengan kandungan fail Code.gs dalam ZIP lengkap ini.
+3. Simpan. PENTING: jangan menekan Run pada loginAdmin; ia menerima input daripada borang sistem.
+4. Project Settings > Script Properties:
+   ADMIN_USERNAME = admin
+   ADMIN_PASSWORD = [kata laluan milik sekolah — jangan kongsi kepada umum]
+   SITE_FAVICON_URL = [URL penuh GitHub Pages ke assets/logo-favicon-48-20261120v7.png] (pilihan)
+5. Deploy > Manage deployments > Edit (pensel) > Version: New version > Deploy.
+6. Buka URL /exec yang DIPAPARKAN selepas deployment dalam Chrome desktop dan Chrome Android.
+   Jika URL deployment baharu berbeza, kemas kini window.SISTEM_CONFIG.WEB_APP_URL dalam github/config.js.
+
+B. PEMASANGAN GITHUB PAGES
+1. Muat naik semua KANDUNGAN folder github/, bukan folder itu sendiri, ke akar repositori.
+2. Pastikan wujud: index.html, config.js, sw.js, manifest-20261120v7.webmanifest,
+   favicon.ico dan keseluruhan folder assets/.
+3. Aktifkan GitHub Pages > Deploy from a branch > main / (root).
+4. Buka URL GitHub Pages dalam Chrome Android. Ia sepatutnya memaparkan lencana dan butang
+   Buka dengan Chrome / Buka Web App tanpa terus masuk ke Google Drive.
+5. Buang PWA lama daripada Home Screen/launcher telefon; buka URL GitHub Pages versi baharu,
+   pilih Install app / Add to Home Screen. Chrome kadang-kadang menyimpan ikon lama sehingga dipasang semula.
+
+C. JIKA ANDROID MASIH MEMAPARKAN GOOGLE DRIVE “UNABLE TO OPEN THE FILE”
+Ini selalunya berlaku SEBELUM kod Apps Script bermula; tidak dapat diselesaikan
+sepenuhnya melalui perubahan CSS/HTML.
+1. Pada laman GitHub, cuba Buka dengan Chrome (Android).
+2. Jika masih gagal, Salin pautan sistem lalu tampal pada bar alamat Chrome, bukan bar carian Google.
+3. Android Settings > Apps > Google Drive > Open by default > OFF “Open supported links”.
+   Nama menu berbeza mengikut jenama telefon; pengubahsuaian ini adalah pilihan, bukan kewajipan.
+4. Pastikan Chrome menggunakan akaun Google guru yang DIBENARKAN mengakses Web App.
+5. Dalam Apps Script, semak deployment adalah Web app dan setting Who has access sepadan
+   dengan akaun guru; jangan set Anyone semata-mata mahu menghapuskan ralat
+   kerana data sejarah perubatan murid dikira data sensitif.
+6. Jika /exec gagal pada PC lain juga, buat New deployment > Web app, gunakan URL baharu,
+   kemudian kemas kini fail github/config.js dan upload semula.
+
+D. KESELAMATAN
+- GitHub Pages ialah laman umum; PWA Github ini tidak menyimpan senarai nama,
+  sejarah perubatan atau nombor kad pengenalan.
+- Data kekal melalui kaedah google.script.run dalam Web App Apps Script.
+- Pelayan menghantar nombor kad pengenalan hanya selepas sesi admin sah.
+- Paparan rekod perubatan tanpa login admin hanya sesuai jika URL Apps Script
+  telah BENAR-BENAR dihadkan kepada akaun guru yang dibenarkan.
+- Nyahterbit kedua-dua CSV Google Sheet jika belum dilakukan.
+- PWA bukan perlindungan akses; sekolah mesti gunakan akses Google Workspace/domain
+  atau kaedah pengesahan yang setara untuk rekod sensitif.
+
+UJIAN YANG BOLEH DILAKUKAN
+- Lihat logo pada laman Github pertama kali dibuka dan pada skrin loading Apps Script.
+- Periksa logo PWA dalam manifest baharu, uninstall PWA lama dan install semula.
+- Android: pengunjung tidak dilencongkan secara automatik ke Drive.
+- Uji klik Buka dengan Chrome dan semak sama ada deploy /exec dibenarkan.
+- Uji carian nama, tapisan, cetak tanpa admin dan dengan admin.
+
+HAD UJIAN
+Kod disemak secara statik dan antaramuka diuji dalam Chrome desktop emulasi mudah alih.
+Akses sebenar URL /exec, akaun Google dan pelayar peranti Android tidak dapat disahkan
+menggunakan persekitaran ini. Masalah izin/deployment mesti disemak pada akaun pemilik.
